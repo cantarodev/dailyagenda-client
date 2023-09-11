@@ -5,9 +5,9 @@ import { useCookies } from "react-cookie";
 import { MdPostAdd } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
 import Auth from "./Auth";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
-const ListHeader = ({ getData, listName, authToken }) => {
+const ListHeader = ({ getData, listName, authToken, theme, setTheme }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [showModal, setShowModal] = useState(false);
   const [showModalLogin, setShowModalLogin] = useState(false);
@@ -15,7 +15,7 @@ const ListHeader = ({ getData, listName, authToken }) => {
   const signOut = () => {
     removeCookie("Email");
     removeCookie("AuthToken");
-    showModalLogin(false);
+    setShowModalLogin(false);
     toast.success("Come back soon");
   };
 
@@ -24,7 +24,7 @@ const ListHeader = ({ getData, listName, authToken }) => {
       <h1>{listName}</h1>
       <div className="button-container">
         <div className="change-mode">
-          <ToggleDarkMode />
+          <ToggleDarkMode theme={theme} setTheme={setTheme} />
         </div>
         {authToken ? (
           <>

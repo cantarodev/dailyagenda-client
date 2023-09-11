@@ -1,30 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TickIcon from "./TickIcon";
 import Modal from "./Modal";
 import ProgressBar from "./ProgressBar";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import moment from "moment";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const ListItem = ({ getData, task }) => {
   const [showModal, setShowModal] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
-  const deleteItem = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/todos/${task.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (response.status === 200) {
-        getData();
-        toast.success(`Task was deleted`);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const deleteItem = () => {
+    toast("Are you sure to delete?", {
+      action: {
+        label: "Delete",
+        onClick: async () => {
+          try {
+            const response = await fetch(
+              `${process.env.REACT_APP_SERVERURL}/todos/${task.id}`,
+              {
+                method: "DELETE",
+              }
+            );
+            if (response.status === 200) {
+              toast.success(`Task was deleted`);
+              setDeleted(true);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        },
+      },
+    });
   };
+
+  useEffect(() => {
+    deleted && getData();
+    setDeleted(false);
+  }, [deleted]);
 
   return (
     <li className="list-item">

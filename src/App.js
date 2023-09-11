@@ -1,18 +1,19 @@
 import ListHeader from "./components/ListHeader";
 import ListItem from "./components/ListItem";
-import Auth from "./components/Auth";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { FaTrashAlt } from "react-icons/fa";
-import { ToastContainer, toast } from "react-toastify";
+import { Toaster, toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const [showModalLogin, setShowModalLogin] = useState(false);
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const authToken = cookies.AuthToken;
   const userEmail = cookies.Email;
-
+  const [deleted, setDeleted] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") === "dark" ? "system" : "light";
+  });
   const [tasks, setTasks] = useState([]);
 
   const getData = async () => {
@@ -27,52 +28,59 @@ const App = () => {
     }
   };
 
-  const deleteAllItems = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_SERVERURL}/todos`, {
-        method: "DELETE",
-      });
-      if (response.status === 200) {
-        getData();
-        toast.success("All tasks deleted successfully");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const deleteAllItems = () => {
+    toast("Are you sure to delete?", {
+      action: {
+        label: "Delete All",
+        onClick: async () => {
+          try {
+            const response = await fetch(
+              `${process.env.REACT_APP_SERVERURL}/todos`,
+              {
+                method: "DELETE",
+              }
+            );
+            if (response.status === 200) {
+              toast.success("All tasks deleted successfully");
+              setDeleted(true);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        },
+      },
+    });
   };
 
   useEffect(() => {
-    if (authToken) {
+    if (authToken || deleted) {
       getData();
     }
-  }, []);
-
-  useEffect(() => {}, []);
+  }, [deleted]);
 
   //Sort by date
   const sortedTasks = tasks?.sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
+
   return (
     <div className="app">
-      <ToastContainer
+      <Toaster
+        theme={theme}
         position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={localStorage.getItem("theme") || "light"}
+        duration={5000}
+        closeButton
+        richColors
       />
+
       <div className="container">
         <>
           <ListHeader
             listName={"Manage your tasks"}
             getData={getData}
             authToken={authToken}
+            theme={theme}
+            setTheme={setTheme}
           />
           {authToken ? (
             <>

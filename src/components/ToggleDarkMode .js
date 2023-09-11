@@ -2,19 +2,15 @@ import { useEffect, useState } from "react";
 import { CiDark } from "react-icons/ci";
 import { MdOutlineLightMode } from "react-icons/md";
 
-const ToggleDarkMode = () => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
-
+const ToggleDarkMode = ({ theme, setTheme }) => {
   const toggleMode = () => {
-    const updatedTheme = theme === "light" ? "dark" : "light";
+    const updatedTheme = theme === "light" ? "system" : "light";
     setTheme(updatedTheme);
     localStorage.setItem("theme", updatedTheme);
   };
 
   useEffect(() => {
-    theme === "dark"
+    theme === "system"
       ? document.body.classList.add("dark-mode")
       : document.body.classList.remove("dark-mode");
   }, [theme]);
