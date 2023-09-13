@@ -81,8 +81,8 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
   };
 
   return (
-    <div className="overlay">
-      <div className="modal">
+    <div className="overlay" onClick={() => setShowModal(false)}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="form-title-container">
           <h3>Let's {mode} your task.</h3>
           <IoIosClose

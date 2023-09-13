@@ -63,6 +63,10 @@ body {
     color: #c8c8c8;
 }
 
+.dark-mode .rdtDays {
+    color: #141414;
+}
+
 /* end styles dark-mode */
 
 .button-container,
@@ -239,6 +243,7 @@ input#range {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .modal {
@@ -327,16 +332,18 @@ input#range {
 }
 
 .user-email {
+    display: flex;
+    align-items: center;
     font-size: 13px;
-    margin: 10px 0;
     color: rgb(114 114 114);
-    text-align: end;
 }
 
 .content-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    padding: 10px 0;
 }
 
 .content-info .status {

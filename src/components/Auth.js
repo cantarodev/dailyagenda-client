@@ -68,8 +68,11 @@ const Auth = ({ setShowModalLogin, setAccess }) => {
   };
 
   return (
-    <div className="overlay">
-      <div className="modal auth-container-box">
+    <div className="overlay" onClick={() => setShowModalLogin(false)}>
+      <div
+        className="modal auth-container-box"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="form-title-container">
           <h3>{isLogIn ? "Please log in" : "Please sign up!"} </h3>
           <IoIosClose

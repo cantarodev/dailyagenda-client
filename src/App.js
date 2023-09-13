@@ -65,7 +65,7 @@ const App = () => {
       <Toaster
         theme={theme === "dark" ? "system" : "light"}
         position="top-right"
-        duration={5000}
+        duration={3000}
         closeButton
         richColors
       />
