@@ -34,10 +34,6 @@ body {
     background-color: rgb(20 20 20);
 }
 
-.dark-mode .app .auth-container-box {
-    background-color: rgb(30 30 30);
-}
-
 .dark-mode .app .list-header {
     background-color: rgb(30 30 30);
 }
@@ -60,6 +56,11 @@ body {
 
 .dark-mode .list-item:hover {
     background-color: rgb(30 30 30);
+}
+
+.dark-mode .content-info .status {
+    background-color: #141414;
+    color: #c8c8c8;
 }
 
 /* end styles dark-mode */
@@ -173,8 +174,9 @@ input {
     width: -webkit-fill-available;
     margin: 11px 0;
     padding: 12px 16px;
-    border-radius: 12px;
+    border-radius: 19px;
     border: 1.5px solid rgb(230 232 236);
+    outline: none;
 }
 
 input::placeholder {
@@ -211,7 +213,6 @@ input#range {
     box-shadow: rgb(0 0 0 / 8%) 0 0 0 1px;
     display: flex;
     justify-content: space-between;
-    cursor: pointer;
 }
 
 .list-item:hover {
@@ -272,11 +273,6 @@ input#range {
     font-size: 13px;
 }
 
-.content-close-modal {
-    display: flex;
-    justify-content: end;
-}
-
 .close-modal {
     cursor: pointer;
     font-size: 30px;
@@ -287,25 +283,6 @@ input#range {
 }
 
 /* Auth */
-.auth-container-box {
-    width: 500px;
-    margin: 20px auto;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: rgb(255 255 255);
-    box-shadow: rgb(0 0 0 / 5%) 0 6px 24px, rgb(0 0 0 / 8%) 0 0 0 1px;
-}
-
-.auth-container-box form {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.auth-container-box form h2 {
-    text-align: center;
-    margin-top: 0;
-}
 
 .auth-options {
     display: flex;
@@ -317,6 +294,16 @@ input#range {
     padding: 10px;
     color: rgb(35 38 47);
     cursor: pointer;
+}
+
+.auth-options .signup {
+    border-top-left-radius: 19px;
+    border-bottom-left-radius: 19px;
+}
+
+.auth-options .login {
+    border-top-right-radius: 19px;
+    border-bottom-right-radius: 19px;
 }
 
 .copyright {
@@ -344,6 +331,20 @@ input#range {
     margin: 10px 0;
     color: rgb(114 114 114);
     text-align: end;
+}
+
+.content-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-info .status {
+    outline: none;
+    padding: 5px;
+    color: #484848;
+    border-radius: 19px;
+    cursor: pointer;
 }
 
 .message-no-data {
@@ -389,10 +390,6 @@ input#range {
 
     .outer-bar {
         display: none;
-    }
-
-    .auth-container-box {
-        width: 100%;
     }
 }
 

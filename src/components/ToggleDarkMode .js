@@ -4,13 +4,13 @@ import { MdOutlineLightMode } from "react-icons/md";
 
 const ToggleDarkMode = ({ theme, setTheme }) => {
   const toggleMode = () => {
-    const updatedTheme = theme === "light" ? "system" : "light";
+    const updatedTheme = theme === "light" ? "dark" : "light";
     setTheme(updatedTheme);
     localStorage.setItem("theme", updatedTheme);
   };
 
   useEffect(() => {
-    theme === "system"
+    theme === "dark"
       ? document.body.classList.add("dark-mode")
       : document.body.classList.remove("dark-mode");
   }, [theme]);

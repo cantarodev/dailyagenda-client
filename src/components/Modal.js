@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import DateTime from "react-datetime";
-import "react-datetime/css/react-datetime.css";
 import moment from "moment";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "react-toastify";
@@ -15,12 +14,12 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
     title: editMode ? task.title : null,
     progress: editMode ? task.progress : 0,
     date: editMode
-      ? moment(task.date).format("DD/MM/YYYY HH:mm:ss")
-      : moment(new Date()).format("DD/MM/YYYY HH:mm:ss"),
+      ? moment(task.date).format("DD/MM/YYYY HH:mm")
+      : moment(new Date()).format("DD/MM/YYYY HH:mm"),
   });
 
   const handleDateChange = (date) => {
-    const formattedDate = moment(date.toDate()).format("DD/MM/YYYY HH:mm:ss");
+    const formattedDate = moment(date.toDate()).format("DD/MM/YYYY HH:mm");
     setData((data) => ({
       ...data,
       date: formattedDate,
@@ -106,7 +105,7 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
             name="date"
             id="date"
             dateFormat="DD/MM/YYYY"
-            timeFormat="HH:mm:ss"
+            timeFormat="HH:mm"
             value={data.date}
             onChange={(date) => handleDateChange(date)}
           />

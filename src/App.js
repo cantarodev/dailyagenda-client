@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { FaTrashAlt } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
+import "react-datetime/css/react-datetime.css";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
@@ -12,14 +13,15 @@ const App = () => {
   const userEmail = cookies.Email;
   const [deleted, setDeleted] = useState(false);
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") === "dark" ? "system" : "light";
+    return localStorage.getItem("theme") === "dark" ? "dark" : "light";
   });
   const [tasks, setTasks] = useState([]);
+  const [status, setStatus] = useState("pending");
 
   const getData = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/todos/${userEmail}`
+        `${process.env.REACT_APP_SERVERURL}/todos/${userEmail}/${status}`
       );
       const json = await response.json();
       setTasks(json);
@@ -53,20 +55,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (authToken || deleted) {
+    if (authToken || deleted || status) {
       getData();
     }
-  }, [deleted]);
-
-  //Sort by date
-  const sortedTasks = tasks?.sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  }, [deleted, status]);
 
   return (
     <div className="app">
       <Toaster
-        theme={theme}
+        theme={theme === "dark" ? "system" : "light"}
         position="top-right"
         duration={5000}
         closeButton
@@ -84,24 +81,43 @@ const App = () => {
           />
           {authToken ? (
             <>
-              <p className="user-email">
-                Welcome to {userEmail} |{" "}
-                <button className="delete-all" onClick={deleteAllItems}>
-                  <FaTrashAlt size={"20"} title={"Delete all"} />
-                </button>
-              </p>
+              <div className="content-info">
+                <select
+                  className="status"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="pending" selected>
+                    Pending
+                  </option>
+                  <option value="due">Due</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <p className="user-email">
+                  Welcome to {userEmail} |{" "}
+                  <button
+                    className="delete-all"
+                    onClick={() =>
+                      tasks.length ? deleteAllItems() : toast("No have tasks!")
+                    }
+                  >
+                    <FaTrashAlt size={"20"} title={"Delete all"} />
+                  </button>
+                </p>
+              </div>
 
               {tasks.length <= 0 && (
                 <p className="message-no-data">No have tasks</p>
               )}
 
-              {sortedTasks?.map((task) => (
+              {tasks?.map((task) => (
                 <ListItem key={task.id} task={task} getData={getData} />
               ))}
             </>
           ) : (
             <>
-              <p>Soon</p>
+              <p>The secret to your success is organizing your time.</p>
             </>
           )}
         </>

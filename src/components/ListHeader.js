@@ -1,6 +1,6 @@
 import Modal from "./Modal";
 import ToggleDarkMode from "./ToggleDarkMode ";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { MdPostAdd } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -11,6 +11,7 @@ const ListHeader = ({ getData, listName, authToken, theme, setTheme }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [showModal, setShowModal] = useState(false);
   const [showModalLogin, setShowModalLogin] = useState(false);
+  const [access, setAccess] = useState(false);
 
   const signOut = () => {
     removeCookie("Email");
@@ -18,6 +19,13 @@ const ListHeader = ({ getData, listName, authToken, theme, setTheme }) => {
     setShowModalLogin(false);
     toast.success("Come back soon");
   };
+
+  useEffect(() => {
+    if (access) {
+      getData();
+      setAccess(false);
+    }
+  }, [access]);
 
   return (
     <div className="list-header">
@@ -47,7 +55,9 @@ const ListHeader = ({ getData, listName, authToken, theme, setTheme }) => {
         <Modal mode={"create"} setShowModal={setShowModal} getData={getData} />
       )}
 
-      {showModalLogin && <Auth setShowModalLogin={setShowModalLogin} />}
+      {showModalLogin && (
+        <Auth setShowModalLogin={setShowModalLogin} setAccess={setAccess} />
+      )}
     </div>
   );
 };
