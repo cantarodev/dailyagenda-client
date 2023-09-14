@@ -88,9 +88,7 @@ const App = () => {
                   onChange={(e) => setStatus(e.target.value)}
                 >
                   <option value="all">All</option>
-                  <option value="pending" selected>
-                    Pending
-                  </option>
+                  <option value="pending">Pending</option>
                   <option value="in progress">In progress</option>
                   <option value="complete">Complete</option>
                 </select>

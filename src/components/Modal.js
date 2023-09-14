@@ -11,17 +11,15 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
 
   const [data, setData] = useState({
     user_email: editMode ? task.user_email : cookies.Email,
-    title: editMode ? task.title : null,
+    title: editMode ? task.title : "",
     progress: editMode ? task.progress : 0,
     notified: editMode ? task.notified : 0,
-    status: editMode ? task.status : null,
-    date: editMode
-      ? moment(task.date).format("DD/MM/YYYY HH:mm")
-      : moment(new Date()).format("DD/MM/YYYY HH:mm"),
+    status: editMode ? task.status : "",
+    date: editMode ? new Date(task.date) : new Date(),
   });
 
   const handleDateChange = (date) => {
-    const formattedDate = moment(date.toDate()).format("DD/MM/YYYY HH:mm");
+    const formattedDate = date.toDate();
     setData((data) => ({
       ...data,
       date: formattedDate,
@@ -58,6 +56,7 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
   const editData = async (e) => {
     e.preventDefault();
     try {
+      console.log(data);
       const response = await fetch(
         `${process.env.REACT_APP_SERVERURL}/todos/${task.id}`,
         {
@@ -112,7 +111,7 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
             onChange={(date) => handleDateChange(date)}
           />
           <br />
-          <label for="range">
+          <label htmlFor="range">
             Drag to select your current progress: {data.progress}%
           </label>
           <input
