@@ -91,8 +91,8 @@ const App = () => {
                   <option value="pending" selected>
                     Pending
                   </option>
-                  <option value="due">Due</option>
-                  <option value="completed">Completed</option>
+                  <option value="in progress">In progress</option>
+                  <option value="complete">Complete</option>
                 </select>
                 <p className="user-email">
                   Welcome to {userEmail} |{" "}

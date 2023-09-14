@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import DateTime from "react-datetime";
 import moment from "moment";
 import { IoIosClose } from "react-icons/io";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const Modal = ({ mode, setShowModal, getData, task }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
@@ -13,6 +13,8 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
     user_email: editMode ? task.user_email : cookies.Email,
     title: editMode ? task.title : null,
     progress: editMode ? task.progress : 0,
+    notified: editMode ? task.notified : 0,
+    status: editMode ? task.status : null,
     date: editMode
       ? moment(task.date).format("DD/MM/YYYY HH:mm")
       : moment(new Date()).format("DD/MM/YYYY HH:mm"),
