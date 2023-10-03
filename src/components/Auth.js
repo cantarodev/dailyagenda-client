@@ -5,6 +5,7 @@ import apiUser from "../utils/api/modules/user.api.js";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
 import { socket, subscription } from "../utils/subscription";
+import moment from "moment";
 
 const Auth = ({ setShowModalLogin, setUpdateListTasks }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
@@ -54,7 +55,14 @@ const Auth = ({ setShowModalLogin, setUpdateListTasks }) => {
     }
 
     if (err || response.detail) {
-      setError(err?.detail || response?.detail);
+      setError(
+        err?.detail ||
+          `${response?.detail} ${
+            response?.lockDate
+              ? moment(response?.lockDate).format("DD-MM-YYYY HH:mm:ss A")
+              : ""
+          }`
+      );
     }
   };
 
