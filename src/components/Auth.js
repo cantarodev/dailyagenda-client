@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCookies } from "react-cookie";
-import PasswordValidatorComponent from "./PasswordValidatorComponent.js";
+import PasswordValidatorComponent from "../commons/PasswordValidatorComponent.js";
+import apiUser from "../utils/api/modules/user.api.js";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
+import { socket, subscription } from "../utils/subscription";
 
-const Auth = ({ setShowModalLogin, setAccess }) => {
+const Auth = ({ setShowModalLogin, setUpdateListTasks }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [isLogIn, setIsLogin] = useState(true);
   const [email, setEmail] = useState(null);
@@ -33,37 +35,38 @@ const Auth = ({ setShowModalLogin, setAccess }) => {
       setError("Make sure passwords match!");
       return;
     }
+    const { response, err } =
+      endpoint === "login"
+        ? await apiUser.login({ email, password })
+        : await apiUser.signup({ email, password });
 
-    const response = await fetch(
-      `${process.env.REACT_APP_SERVERURL}/users/${endpoint}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
-
-    const data = await response.json();
-    if (data.detail) {
-      setError(data.detail);
-    } else {
-      setCookie("Email", data.email);
-      setCookie("AuthToken", data.token);
-
+    if (response && !response.detail) {
+      setCookie("Email", response.email);
+      setCookie("AuthToken", response.token);
       requestNotificationPermission();
       toast.success("Welcome, check your schedule!");
+
+      socket.emit("subscribeToTasks", email);
+      socket.emit("notification", response.email);
+
       setShowModalLogin(false);
-      setAccess(true);
+      setUpdateListTasks(true);
+    }
+
+    if (err || response.detail) {
+      setError(err?.detail || response?.detail);
     }
   };
 
-  // Solicitar permiso para enviar notificaciones push
-  const requestNotificationPermission = async () => {
+  const requestNotificationPermission = () => {
     if ("Notification" in window) {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        console.log("Permission to send push notifications granted");
-      }
+      return Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          if ("serviceWorker" in navigator) {
+            subscription().catch((err) => console.log(err));
+          }
+        }
+      });
     }
   };
 

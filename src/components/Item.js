@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import TickIcon from "./TickIcon";
+import TickIcon from "../commons/TickIcon";
 import Modal from "./Modal";
-import ProgressBar from "./ProgressBar";
+import ProgressBar from "../commons/ProgressBar";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import moment from "moment";
 import { toast } from "sonner";
+import { useCookies } from "react-cookie";
+import todoApi from "../utils/api/modules/todos.api";
 
-const ListItem = ({ getData, task }) => {
+const ListItem = ({ getDataSocket, task }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleted, setDeleted] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies(null);
 
   const deleteItem = () => {
     toast("Are you sure to delete?", {
@@ -16,13 +19,8 @@ const ListItem = ({ getData, task }) => {
         label: "Delete",
         onClick: async () => {
           try {
-            const response = await fetch(
-              `${process.env.REACT_APP_SERVERURL}/todos/${task.id}`,
-              {
-                method: "DELETE",
-              }
-            );
-            if (response.status === 200) {
+            const { response } = await todoApi.delete(task.id);
+            if (response) {
               toast.success(`Task was deleted`);
               setDeleted(true);
             }
@@ -35,7 +33,7 @@ const ListItem = ({ getData, task }) => {
   };
 
   useEffect(() => {
-    deleted && getData();
+    deleted && getDataSocket("all");
     setDeleted(false);
   }, [deleted]);
 
@@ -48,7 +46,7 @@ const ListItem = ({ getData, task }) => {
         <TickIcon size={"20"} color={"#FF0000"} progress={task.progress} />
         <p className="task-title">
           {task.title} <br />
-          <small>{moment(task.date).format("DD-MM-YYYY HH:mm:ss")}</small>
+          <small>{moment(task.date).format("DD-MM-YYYY HH:mm:ss A")}</small>
         </p>
         <ProgressBar progress={task.progress} />
       </div>
@@ -65,7 +63,7 @@ const ListItem = ({ getData, task }) => {
         <Modal
           mode={"edit"}
           setShowModal={setShowModal}
-          getData={getData}
+          getDataSocket={getDataSocket}
           task={task}
         />
       )}

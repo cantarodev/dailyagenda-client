@@ -1,11 +1,13 @@
-import ListHeader from "./components/ListHeader";
-import ListItem from "./components/ListItem";
+import Header from "./components/Header";
+import Item from "./components/Item";
+import { socket } from "./utils/subscription";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { FaTrashAlt } from "react-icons/fa";
 import { Toaster, toast } from "sonner";
-import "react-toastify/dist/ReactToastify.css";
 import "react-datetime/css/react-datetime.css";
+import CheckTokenExpiration from "./commons/CheckTokenExpiration";
+import todoApi from "./utils/api/modules/todos.api";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
@@ -17,17 +19,14 @@ const App = () => {
   });
   const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState("pending");
+  const [isTaskProcess, setIsTaskProcess] = useState(false);
+  const [updateListTasks, setUpdateListTasks] = useState(false);
 
-  const getData = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/todos/${userEmail}/${status}`
-      );
-      const json = await response.json();
-      setTasks(json);
-    } catch (error) {
-      console.log(error);
-    }
+  const getDataSocket = (sendToUser = "one") => {
+    socket.emit("getTodos", {
+      userEmail: userEmail,
+      sendToUser: sendToUser,
+    });
   };
 
   const deleteAllItems = () => {
@@ -36,13 +35,8 @@ const App = () => {
         label: "Delete All",
         onClick: async () => {
           try {
-            const response = await fetch(
-              `${process.env.REACT_APP_SERVERURL}/todos`,
-              {
-                method: "DELETE",
-              }
-            );
-            if (response.status === 200) {
+            const response = await todoApi.deleteAll();
+            if (response) {
               toast.success("All tasks deleted successfully");
               setDeleted(true);
             }
@@ -55,10 +49,33 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (authToken || deleted || status) {
-      getData();
+    if (authToken) {
+      getDataSocket();
     }
-  }, [deleted, status]);
+  }, [status]);
+
+  useEffect(() => {
+    if (authToken) {
+      getDataSocket("all");
+      console.log(updateListTasks);
+      setIsTaskProcess(false);
+      setUpdateListTasks(false);
+    }
+  }, [updateListTasks, isTaskProcess, deleted]);
+
+  useEffect(() => {
+    socket.on("getListTodos", (data) => {
+      setTasks(data);
+      console.log("aaaa");
+    });
+    socket.on("isTaskProcess", (value) => {
+      setIsTaskProcess(value);
+    });
+    socket.on("successfulSubscription", (value) => {
+      setUpdateListTasks(value);
+      console.log("successfulSubscription");
+    });
+  }, []);
 
   return (
     <div className="app">
@@ -69,15 +86,18 @@ const App = () => {
         closeButton
         richColors
       />
-
+      <CheckTokenExpiration />
       <div className="container">
         <>
-          <ListHeader
+          <Header
             listName={"Manage your tasks"}
-            getData={getData}
+            getDataSocket={getDataSocket}
             authToken={authToken}
             theme={theme}
             setTheme={setTheme}
+            tasks={tasks}
+            setTasks={setTasks}
+            setUpdateListTasks={setUpdateListTasks}
           />
           {authToken ? (
             <>
@@ -105,13 +125,22 @@ const App = () => {
                 </p>
               </div>
 
-              {tasks.length <= 0 && (
+              {(tasks.length <= 0 ||
+                (!Object.values(tasks).some((obj) => obj.status === status) &&
+                  status !== "all")) && (
                 <p className="message-no-data">No have tasks</p>
               )}
 
-              {tasks?.map((task) => (
-                <ListItem key={task.id} task={task} getData={getData} />
-              ))}
+              {tasks?.map(
+                (task) =>
+                  (status === task.status || status === "all") && (
+                    <Item
+                      key={task.id}
+                      task={task}
+                      getDataSocket={getDataSocket}
+                    />
+                  )
+              )}
             </>
           ) : (
             <>

@@ -4,8 +4,9 @@ import DateTime from "react-datetime";
 import moment from "moment";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
+import todoApi from "../utils/api/modules/todos.api";
 
-const Modal = ({ mode, setShowModal, getData, task }) => {
+const Modal = ({ mode, setShowModal, getDataSocket, task }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const editMode = mode === "edit" ? true : false;
 
@@ -14,7 +15,7 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
     title: editMode ? task.title : "",
     progress: editMode ? task.progress : 0,
     notified: editMode ? task.notified : 0,
-    status: editMode ? task.status : "",
+    status: editMode ? task.status : "pending",
     date: editMode ? new Date(task.date) : new Date(),
   });
 
@@ -37,15 +38,10 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
   const postData = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_SERVERURL}/todos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (response.status === 200) {
+      const { response } = await todoApi.create(data);
+      if (response) {
         setShowModal(false);
-        getData();
+        getDataSocket("all");
         toast.success(`Task created`);
       }
     } catch (error) {
@@ -56,19 +52,10 @@ const Modal = ({ mode, setShowModal, getData, task }) => {
   const editData = async (e) => {
     e.preventDefault();
     try {
-      console.log(data);
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVERURL}/todos/${task.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        }
-      );
-
-      if (response.status === 200) {
+      const { response } = await todoApi.update(data, task.id);
+      if (response) {
         setShowModal(false);
-        getData();
+        getDataSocket("all");
         toast.success(`Modififed task`);
       }
     } catch (error) {
