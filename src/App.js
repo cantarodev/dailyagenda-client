@@ -57,7 +57,6 @@ const App = () => {
   useEffect(() => {
     if (authToken) {
       getDataSocket("all");
-      console.log(updateListTasks);
       setIsTaskProcess(false);
       setUpdateListTasks(false);
     }
@@ -66,14 +65,12 @@ const App = () => {
   useEffect(() => {
     socket.on("getListTodos", (data) => {
       setTasks(data);
-      console.log("aaaa");
     });
     socket.on("isTaskProcess", (value) => {
       setIsTaskProcess(value);
     });
     socket.on("successfulSubscription", (value) => {
       setUpdateListTasks(value);
-      console.log("successfulSubscription");
     });
   }, []);
 

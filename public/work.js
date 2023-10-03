@@ -10,7 +10,7 @@ self.addEventListener("push", (e) => {
   const options = {
     body: data.title,
     icon: "/list.png",
-    // tag: "unique-notification-tag",
+    tag: "unique-notification-tag",
   };
 
   e.waitUntil(

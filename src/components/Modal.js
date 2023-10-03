@@ -35,8 +35,18 @@ const Modal = ({ mode, setShowModal, getDataSocket, task }) => {
     }));
   };
 
-  const postData = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
+
+    const currentDate = new Date();
+    editMode
+      ? editData()
+      : data.date > currentDate
+      ? postData()
+      : toast.error(`Date and time must be greater than current`);
+  };
+
+  const postData = async () => {
     try {
       const { response } = await todoApi.create(data);
       if (response) {
@@ -49,8 +59,7 @@ const Modal = ({ mode, setShowModal, getDataSocket, task }) => {
     }
   };
 
-  const editData = async (e) => {
-    e.preventDefault();
+  const editData = async () => {
     try {
       const { response } = await todoApi.update(data, task.id);
       if (response) {
@@ -78,7 +87,7 @@ const Modal = ({ mode, setShowModal, getDataSocket, task }) => {
             onClick={() => setShowModal(false)}
           />
         </div>
-        <form>
+        <form onSubmit={handleFormSubmit}>
           <input
             required
             maxLength={30}
@@ -111,12 +120,7 @@ const Modal = ({ mode, setShowModal, getDataSocket, task }) => {
             value={data.progress}
             onChange={handleChange}
           />
-          <input
-            className={mode}
-            type="submit"
-            value="Send"
-            onClick={editMode ? editData : postData}
-          />
+          <input className={mode} type="submit" value="Send" />
         </form>
       </div>
     </div>
