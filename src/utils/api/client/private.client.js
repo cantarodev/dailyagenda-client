@@ -2,7 +2,7 @@ import axios from "axios";
 import queryString from "query-string";
 import { getCookie } from "../../cookie";
 
-const baseURL = "http://localhost:8000/api/v1";
+const baseURL = process.env.REACT_APP_SERVERURL;
 
 const privateClient = axios.create({
   baseURL,
