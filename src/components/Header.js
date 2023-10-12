@@ -8,14 +8,13 @@ import Auth from "./Auth";
 import { toast } from "sonner";
 
 const ListHeader = ({
-  getDataSocket,
   listName,
   authToken,
   theme,
   setTheme,
-  tasks,
-  setTasks,
-  setUpdateListTask,
+  setSendToUser,
+  startWebSocket,
+  closeWebSocket,
 }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [showModal, setShowModal] = useState(false);
@@ -26,6 +25,7 @@ const ListHeader = ({
     removeCookie("AuthToken");
     setShowModalLogin(false);
     toast.success("Come back soon");
+    closeWebSocket();
   };
 
   return (
@@ -56,14 +56,15 @@ const ListHeader = ({
         <Modal
           mode={"create"}
           setShowModal={setShowModal}
-          setUpdateListTask={setUpdateListTask}
+          setSendToUser={setSendToUser}
         />
       )}
 
       {showModalLogin && (
         <Auth
           setShowModalLogin={setShowModalLogin}
-          setUpdateListTask={setUpdateListTask}
+          setSendToUser={setSendToUser}
+          startWebSocket={startWebSocket}
         />
       )}
     </div>

@@ -6,7 +6,7 @@ import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
 import todoApi from "../utils/api/modules/todos.api";
 
-const Modal = ({ mode, setShowModal, setUpdateListTask, task }) => {
+const Modal = ({ mode, setShowModal, setSendToUser, task }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const editMode = mode === "edit" ? true : false;
 
@@ -51,7 +51,7 @@ const Modal = ({ mode, setShowModal, setUpdateListTask, task }) => {
       const { response } = await todoApi.create(data);
       if (response) {
         setShowModal(false);
-        setUpdateListTask(true);
+        setSendToUser("all");
         toast.success(`Task created`);
       }
     } catch (error) {
@@ -64,7 +64,7 @@ const Modal = ({ mode, setShowModal, setUpdateListTask, task }) => {
       const { response } = await todoApi.update(data, task.id);
       if (response) {
         setShowModal(false);
-        setUpdateListTask(true);
+        setSendToUser("all");
         toast.success(`Modififed task`);
       }
     } catch (error) {

@@ -4,10 +4,10 @@ import PasswordValidatorComponent from "../commons/PasswordValidatorComponent.js
 import apiUser from "../utils/api/modules/user.api.js";
 import { IoIosClose } from "react-icons/io";
 import { toast } from "sonner";
-import { socket, subscription } from "../utils/subscription";
+import { subscription } from "../utils/subscription";
 import moment from "moment";
 
-const Auth = ({ setShowModalLogin, setUpdateListTask }) => {
+const Auth = ({ setShowModalLogin, setSendToUser, startWebSocket }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [isLogIn, setIsLogin] = useState(true);
   const [email, setEmail] = useState(null);
@@ -47,11 +47,8 @@ const Auth = ({ setShowModalLogin, setUpdateListTask }) => {
       requestNotificationPermission();
       toast.success("Welcome, check your schedule!");
 
-      socket.emit("subscribeToTasks", response.email);
-      socket.emit("notification", response.email);
-
       setShowModalLogin(false);
-      setUpdateListTask(true);
+      startWebSocket(response.token);
     }
 
     if (err || response.detail) {

@@ -1,6 +1,6 @@
 import Header from "./components/Header";
 import Item from "./components/Item";
-import { socket } from "./utils/subscription";
+import io from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { FaTrashAlt } from "react-icons/fa";
@@ -17,14 +17,8 @@ const App = () => {
   });
   const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState("pending");
-  const [updateListTask, setUpdateListTask] = useState(false);
-
-  const getDataSocket = (sendToUser = "one") => {
-    socket.emit("getTodos", {
-      userEmail: Email,
-      sendToUser: sendToUser,
-    });
-  };
+  const [socket, setSocket] = useState(null);
+  const [sendToUser, setSendToUser] = useState("");
 
   const deleteAllItems = () => {
     toast("Are you sure to delete?", {
@@ -35,7 +29,7 @@ const App = () => {
             const response = await todoApi.deleteAll();
             if (response) {
               toast.success("All tasks deleted successfully");
-              setUpdateListTask(true);
+              setSendToUser("all");
             }
           } catch (error) {
             console.log(error);
@@ -45,35 +39,66 @@ const App = () => {
     });
   };
 
-  useEffect(() => {
-    if (AuthToken) {
-      socket.emit("subscribeToTasks", Email);
-    }
-  }, []);
+  const handleStatus = (e) => {
+    setStatus(e.target.value);
+    setSendToUser("one");
+  };
 
-  useEffect(() => {
-    if (AuthToken) {
-      getDataSocket();
-    }
-  }, [status]);
+  function startWebSocket(token) {
+    const socket = io("http://localhost:8000", {
+      query: { token },
+      withCredentials: true,
+    });
 
-  useEffect(() => {
-    if (AuthToken) {
-      getDataSocket("all");
-      setUpdateListTask(false);
-    }
-  }, [updateListTask]);
+    socket.on("connect", () => {
+      console.log("Connection established with the server");
+    });
 
-  useEffect(() => {
     socket.on("getListTodos", (data) => {
       setTasks(data);
     });
+
     socket.on("changeStatusProcess", (value) => {
-      setUpdateListTask(value);
+      setSendToUser("all");
     });
+
     socket.on("successfulSubscription", (value) => {
-      setUpdateListTask(value);
+      setSendToUser("one");
     });
+
+    socket.emit("subscribeToTasks", Email);
+
+    socket.emit("notification", Email);
+
+    socket.emit("getTodos", {
+      userEmail: Email,
+      sendToUser: "one",
+    });
+
+    setSocket(socket);
+  }
+
+  const closeWebSocket = () => {
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      console.log("Connection closed");
+    }
+  };
+  useEffect(() => {
+    if (socket && socket.connected && AuthToken) {
+      socket.emit("getTodos", {
+        userEmail: Email,
+        sendToUser: sendToUser,
+      });
+      setSendToUser("");
+    }
+  }, [sendToUser]);
+
+  useEffect(() => {
+    if (AuthToken) {
+      startWebSocket(AuthToken);
+    }
   }, []);
 
   return (
@@ -83,20 +108,20 @@ const App = () => {
         position="top-right"
         duration={3000}
         closeButton
-        richColors
       />
       <CheckTokenExpiration />
       <div className="container">
         <>
           <Header
             listName={"Manage your tasks"}
-            getDataSocket={getDataSocket}
             authToken={AuthToken}
             theme={theme}
             setTheme={setTheme}
             tasks={tasks}
             setTasks={setTasks}
-            setUpdateListTask={setUpdateListTask}
+            setSendToUser={setSendToUser}
+            startWebSocket={startWebSocket}
+            closeWebSocket={closeWebSocket}
           />
           {AuthToken ? (
             <>
@@ -104,7 +129,7 @@ const App = () => {
                 <select
                   className="status"
                   value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                  onChange={(e) => handleStatus(e)}
                 >
                   <option value="all">All</option>
                   <option value="pending">Pending</option>
@@ -136,7 +161,7 @@ const App = () => {
                     <Item
                       key={task.id}
                       task={task}
-                      setUpdateListTask={setUpdateListTask}
+                      setSendToUser={setSendToUser}
                     />
                   )
               )}

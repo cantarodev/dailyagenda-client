@@ -7,7 +7,7 @@ import moment from "moment";
 import { toast } from "sonner";
 import todoApi from "../utils/api/modules/todos.api";
 
-const ListItem = ({ setUpdateListTask, task }) => {
+const ListItem = ({ setSendToUser, task }) => {
   const [showModal, setShowModal] = useState(false);
 
   const deleteItem = () => {
@@ -19,7 +19,7 @@ const ListItem = ({ setUpdateListTask, task }) => {
             const { response } = await todoApi.delete(task.id);
             if (response) {
               toast.success(`Task was deleted`);
-              setUpdateListTask(true);
+              setSendToUser("all");
             }
           } catch (error) {
             console.log(error);
@@ -55,7 +55,7 @@ const ListItem = ({ setUpdateListTask, task }) => {
         <Modal
           mode={"edit"}
           setShowModal={setShowModal}
-          setUpdateListTask={setUpdateListTask}
+          setSendToUser={setSendToUser}
           task={task}
         />
       )}
