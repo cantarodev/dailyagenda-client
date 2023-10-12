@@ -48,7 +48,7 @@ const Auth = ({ setShowModalLogin, setSendToUser, startWebSocket }) => {
       toast.success("Welcome, check your schedule!");
 
       setShowModalLogin(false);
-      startWebSocket(response.token);
+      startWebSocket(response.token, response.email);
     }
 
     if (err || response.detail) {

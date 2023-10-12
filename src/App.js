@@ -44,7 +44,7 @@ const App = () => {
     setSendToUser("one");
   };
 
-  function startWebSocket(token) {
+  function startWebSocket(token, email) {
     const socket = io("http://localhost:8000", {
       query: { token },
       withCredentials: true,
@@ -58,20 +58,16 @@ const App = () => {
       setTasks(data);
     });
 
-    socket.on("changeStatusProcess", (value) => {
+    socket.on("changeStatusProcess", () => {
       setSendToUser("all");
     });
 
-    socket.on("successfulSubscription", (value) => {
-      setSendToUser("one");
-    });
+    socket.emit("joinUser", email);
 
-    socket.emit("subscribeToTasks", Email);
-
-    socket.emit("notification", Email);
+    socket.emit("notification", email);
 
     socket.emit("getTodos", {
-      userEmail: Email,
+      userEmail: email,
       sendToUser: "one",
     });
 
@@ -85,6 +81,7 @@ const App = () => {
       console.log("Connection closed");
     }
   };
+
   useEffect(() => {
     if (socket && socket.connected && AuthToken) {
       socket.emit("getTodos", {
@@ -97,7 +94,7 @@ const App = () => {
 
   useEffect(() => {
     if (AuthToken) {
-      startWebSocket(AuthToken);
+      startWebSocket(AuthToken, Email);
     }
   }, []);
 
@@ -109,7 +106,7 @@ const App = () => {
         duration={3000}
         closeButton
       />
-      <CheckTokenExpiration />
+      <CheckTokenExpiration closeWebSocket={closeWebSocket} />
       <div className="container">
         <>
           <Header
