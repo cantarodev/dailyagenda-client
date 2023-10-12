@@ -2,7 +2,7 @@ import io from "socket.io-client";
 import { getCookie } from "./cookie";
 import apiSubscription from "./api/modules/subscription.api";
 
-export const socket = io("http://localhost:8000");
+export const socket = io("http://localhost:8000", { withCredentials: true });
 
 const PUBLIC_VAPID_KEY =
   "BJ4cOeLeruKeGJ7pkoYDOrnGl_rDMvObWmWh8urklnZjnye00efE3v99iZCX3jE5X6aDGZa0JyWaeBW3lzd_oOw";

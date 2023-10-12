@@ -1,6 +1,6 @@
 import Modal from "./Modal";
 import ToggleDarkMode from "../commons/ToggleDarkMode ";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { MdPostAdd } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -15,7 +15,7 @@ const ListHeader = ({
   setTheme,
   tasks,
   setTasks,
-  setUpdateListTasks,
+  setUpdateListTask,
 }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [showModal, setShowModal] = useState(false);
@@ -56,17 +56,14 @@ const ListHeader = ({
         <Modal
           mode={"create"}
           setShowModal={setShowModal}
-          getDataSocket={getDataSocket}
-          tasks={tasks}
-          setTasks={setTasks}
+          setUpdateListTask={setUpdateListTask}
         />
       )}
 
       {showModalLogin && (
         <Auth
           setShowModalLogin={setShowModalLogin}
-          getDataSocket={getDataSocket}
-          setUpdateListTasks={setUpdateListTasks}
+          setUpdateListTask={setUpdateListTask}
         />
       )}
     </div>

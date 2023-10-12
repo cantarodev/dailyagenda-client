@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TickIcon from "../commons/TickIcon";
 import Modal from "./Modal";
 import ProgressBar from "../commons/ProgressBar";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import moment from "moment";
 import { toast } from "sonner";
-import { useCookies } from "react-cookie";
 import todoApi from "../utils/api/modules/todos.api";
 
-const ListItem = ({ getDataSocket, task }) => {
+const ListItem = ({ setUpdateListTask, task }) => {
   const [showModal, setShowModal] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(null);
 
   const deleteItem = () => {
     toast("Are you sure to delete?", {
@@ -22,7 +19,7 @@ const ListItem = ({ getDataSocket, task }) => {
             const { response } = await todoApi.delete(task.id);
             if (response) {
               toast.success(`Task was deleted`);
-              setDeleted(true);
+              setUpdateListTask(true);
             }
           } catch (error) {
             console.log(error);
@@ -31,11 +28,6 @@ const ListItem = ({ getDataSocket, task }) => {
       },
     });
   };
-
-  useEffect(() => {
-    deleted && getDataSocket("all");
-    setDeleted(false);
-  }, [deleted]);
 
   return (
     <li
@@ -63,7 +55,7 @@ const ListItem = ({ getDataSocket, task }) => {
         <Modal
           mode={"edit"}
           setShowModal={setShowModal}
-          getDataSocket={getDataSocket}
+          setUpdateListTask={setUpdateListTask}
           task={task}
         />
       )}

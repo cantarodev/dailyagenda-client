@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { socket, subscription } from "../utils/subscription";
 import moment from "moment";
 
-const Auth = ({ setShowModalLogin, setUpdateListTasks }) => {
+const Auth = ({ setShowModalLogin, setUpdateListTask }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [isLogIn, setIsLogin] = useState(true);
   const [email, setEmail] = useState(null);
@@ -47,11 +47,11 @@ const Auth = ({ setShowModalLogin, setUpdateListTasks }) => {
       requestNotificationPermission();
       toast.success("Welcome, check your schedule!");
 
-      socket.emit("subscribeToTasks", email);
+      socket.emit("subscribeToTasks", response.email);
       socket.emit("notification", response.email);
 
       setShowModalLogin(false);
-      setUpdateListTasks(true);
+      setUpdateListTask(true);
     }
 
     if (err || response.detail) {

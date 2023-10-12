@@ -11,20 +11,17 @@ import todoApi from "./utils/api/modules/todos.api";
 
 const App = () => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
-  const authToken = cookies.AuthToken;
-  const userEmail = cookies.Email;
-  const [deleted, setDeleted] = useState(false);
+  const { AuthToken, Email } = cookies;
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") === "dark" ? "dark" : "light";
   });
   const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState("pending");
-  const [isTaskProcess, setIsTaskProcess] = useState(false);
-  const [updateListTasks, setUpdateListTasks] = useState(false);
+  const [updateListTask, setUpdateListTask] = useState(false);
 
   const getDataSocket = (sendToUser = "one") => {
     socket.emit("getTodos", {
-      userEmail: userEmail,
+      userEmail: Email,
       sendToUser: sendToUser,
     });
   };
@@ -38,7 +35,7 @@ const App = () => {
             const response = await todoApi.deleteAll();
             if (response) {
               toast.success("All tasks deleted successfully");
-              setDeleted(true);
+              setUpdateListTask(true);
             }
           } catch (error) {
             console.log(error);
@@ -49,28 +46,33 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (authToken) {
+    if (AuthToken) {
+      socket.emit("subscribeToTasks", Email);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (AuthToken) {
       getDataSocket();
     }
   }, [status]);
 
   useEffect(() => {
-    if (authToken) {
+    if (AuthToken) {
       getDataSocket("all");
-      setIsTaskProcess(false);
-      setUpdateListTasks(false);
+      setUpdateListTask(false);
     }
-  }, [updateListTasks, isTaskProcess, deleted]);
+  }, [updateListTask]);
 
   useEffect(() => {
     socket.on("getListTodos", (data) => {
       setTasks(data);
     });
-    socket.on("isTaskProcess", (value) => {
-      setIsTaskProcess(value);
+    socket.on("changeStatusProcess", (value) => {
+      setUpdateListTask(value);
     });
     socket.on("successfulSubscription", (value) => {
-      setUpdateListTasks(value);
+      setUpdateListTask(value);
     });
   }, []);
 
@@ -89,14 +91,14 @@ const App = () => {
           <Header
             listName={"Manage your tasks"}
             getDataSocket={getDataSocket}
-            authToken={authToken}
+            authToken={AuthToken}
             theme={theme}
             setTheme={setTheme}
             tasks={tasks}
             setTasks={setTasks}
-            setUpdateListTasks={setUpdateListTasks}
+            setUpdateListTask={setUpdateListTask}
           />
-          {authToken ? (
+          {AuthToken ? (
             <>
               <div className="content-info">
                 <select
@@ -110,7 +112,7 @@ const App = () => {
                   <option value="complete">Complete</option>
                 </select>
                 <p className="user-email">
-                  Welcome to {userEmail} |{" "}
+                  Welcome to {Email} |{" "}
                   <button
                     className="delete-all"
                     onClick={() =>
@@ -134,7 +136,7 @@ const App = () => {
                     <Item
                       key={task.id}
                       task={task}
-                      getDataSocket={getDataSocket}
+                      setUpdateListTask={setUpdateListTask}
                     />
                   )
               )}
