@@ -3,26 +3,22 @@ import apiSubscription from "./api/modules/subscription.api";
 
 const PUBLIC_VAPID_KEY =
   "BJ4cOeLeruKeGJ7pkoYDOrnGl_rDMvObWmWh8urklnZjnye00efE3v99iZCX3jE5X6aDGZa0JyWaeBW3lzd_oOw";
-
 export const subscription = async () => {
-  const swUrl = `${process.env.PUBLIC_URL}/work.js`;
+  const swUrl = "/work.js";
   const register = await navigator.serviceWorker.register(swUrl);
-
   const subscription = await register.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
   });
 
   const email = getCookie("Email");
-  const data = {
+  const dataSubscription = {
     userEmail: decodeURIComponent(email),
     subscription: subscription,
   };
 
   try {
-    const { response, err } = await apiSubscription.createSubscription(data);
-    response && console.log(response);
-    err && console.error(err);
+    await apiSubscription.createSubscription(dataSubscription);
   } catch (error) {
     console.error(error);
   }

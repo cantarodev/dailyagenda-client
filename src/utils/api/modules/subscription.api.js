@@ -2,6 +2,7 @@ import privateClient from "../client/private.client";
 
 const endPoints = {
   createSubscription: "subscriptions",
+  deleteSubscription: "subscriptions/delete",
 };
 
 const subscriptionApi = {

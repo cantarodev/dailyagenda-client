@@ -2,11 +2,11 @@ import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import jwt_decode from "jwt-decode";
 
-const CheckTokenExpiration = ({ closeWebSocket }) => {
+const CheckTokenExpiration = () => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
 
   useEffect(() => {
-    const expirationCheckInterval = setInterval(() => {
+    const expirationCheckInterval = setInterval(async () => {
       const authToken = cookies.AuthToken;
       if (authToken) {
         const decodedToken = jwt_decode(authToken);
@@ -16,7 +16,6 @@ const CheckTokenExpiration = ({ closeWebSocket }) => {
         if (expirationTimeInSeconds < currentTimestamp) {
           removeCookie("AuthToken");
           removeCookie("Email");
-          closeWebSocket();
         }
       }
     }, 10000);

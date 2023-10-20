@@ -12,11 +12,40 @@ self.addEventListener("push", (e) => {
     icon: "/list.png",
     tag: "unique-notification-tag",
   };
-
   e.waitUntil(
     self.registration.showNotification(
       `Pending task: ${formattedHours}:${formattedMinutes} ${ampm}`,
       options
     )
   );
+});
+
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+  let redirectUrl = event.currentTarget.registration.scope;
+  if (redirectUrl.endsWith("/")) {
+    redirectUrl = redirectUrl.slice(0, -1);
+  }
+  if (redirectUrl) {
+    event.waitUntil(
+      (async function () {
+        const allClients = await clients.matchAll({
+          includeUncontrolled: true,
+        });
+        let chatClient;
+        for (let i = 0; i < allClients.length; i++) {
+          let client = allClients[i];
+          if (client["url"].indexOf(redirectUrl) >= 0) {
+            client.focus();
+            chatClient = client;
+            break;
+          }
+        }
+        if (chatClient == null || chatClient == "undefined") {
+          chatClient = clients.openWindow(redirectUrl);
+          return chatClient;
+        }
+      })()
+    );
+  }
 });

@@ -14,18 +14,16 @@ const ListHeader = ({
   setTheme,
   setSendToUser,
   startWebSocket,
-  closeWebSocket,
 }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [showModal, setShowModal] = useState(false);
   const [showModalLogin, setShowModalLogin] = useState(false);
 
-  const signOut = () => {
+  const signOut = async () => {
     removeCookie("Email");
     removeCookie("AuthToken");
     setShowModalLogin(false);
     toast.success("Come back soon");
-    closeWebSocket();
   };
 
   return (
@@ -63,7 +61,6 @@ const ListHeader = ({
       {showModalLogin && (
         <Auth
           setShowModalLogin={setShowModalLogin}
-          setSendToUser={setSendToUser}
           startWebSocket={startWebSocket}
         />
       )}

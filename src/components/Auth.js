@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { subscription } from "../utils/subscription";
 import moment from "moment";
 
-const Auth = ({ setShowModalLogin, setSendToUser, startWebSocket }) => {
+const Auth = ({ setShowModalLogin, startWebSocket }) => {
   const [cookies, setCookie, removeCookie] = useCookies(null);
   const [isLogIn, setIsLogin] = useState(true);
   const [email, setEmail] = useState(null);
@@ -48,7 +48,7 @@ const Auth = ({ setShowModalLogin, setSendToUser, startWebSocket }) => {
       toast.success("Welcome, check your schedule!");
 
       setShowModalLogin(false);
-      startWebSocket(response.token, response.email);
+      startWebSocket(response.email);
     }
 
     if (err || response.detail) {
